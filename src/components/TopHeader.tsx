@@ -1,8 +1,10 @@
 import React, {useEffect, useState} from "react";
-import {Avatar, Dropdown, Layout, Menu, Space, Tabs} from "antd";
+import {Avatar, Dropdown, Layout, Menu, message, Space, Tabs} from "antd";
 import "../less/TopHeader.less";
 import {IUserInfo} from "../interfaces/Interface";
 import {UserOutlined, SettingOutlined, LogoutOutlined, GithubOutlined, BellOutlined} from "@ant-design/icons";
+import {useNavigate} from "react-router-dom";
+import {CurrentUserInfoApi} from "../request/api";
 
 export default function TopHeader() {
 
@@ -79,14 +81,45 @@ export default function TopHeader() {
     const [nickname, setNickname] = useState<string>("");
     const [avatar, setAvatar] = useState<string>("")
 
+    const navigate = useNavigate();
+
     useEffect(() => {
-        if (localStorage.getItem("userInfo")) {
+        if (!localStorage.getItem("userInfo")) {
+            let userInfo: IUserInfo = {
+                avatar: "",
+                birthday: "",
+                city: "",
+                email: "",
+                genderDesc: "",
+                id: "",
+                job: "",
+                mobile: 0,
+                nickname: "",
+                sign: "",
+                sourceTypeDesc: "",
+                typeDesc: "",
+                username: ""
+            }
+            CurrentUserInfoApi().then((res: any) => {
+                userInfo = res;
+                localStorage.setItem("userInfo", JSON.stringify(userInfo));
+                setTimeout(() => {
+                    setNickname(userInfo.nickname);
+                    setAvatar(userInfo.avatar)
+                }, 0);
+            }).catch(() => {
+                message.error("用户信息过期或不合法！请重新登录！", 1)
+                    .then(() => navigate("/login"));
+            })
+        } else {
             let userJsonStr: any = localStorage.getItem("userInfo");
             const userInfo: IUserInfo = JSON.parse(userJsonStr);
-            setNickname(userInfo.nickname);
-            setAvatar(userInfo.avatar)
+            setTimeout(() => {
+                setNickname(userInfo.nickname);
+                setAvatar(userInfo.avatar)
+            }, 0);
         }
-    }, [])
+    }, [navigate])
 
     const onGithubClick = () => {
         window.open("https://github.com/DrEAmSs59/dream-journey-admin");

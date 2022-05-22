@@ -1,95 +1,47 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import './less/App.less';
-import {Breadcrumb, Layout, Menu, MenuProps, message} from "antd";
-import {DesktopOutlined, PieChartOutlined, FileOutlined, TeamOutlined, UserOutlined,} from '@ant-design/icons';
-import {IUserInfo} from "./interfaces/Interface";
-import {CurrentUserInfoApi} from "./request/api";
-import {useNavigate} from "react-router-dom";
+import {Breadcrumb, Layout, Space} from "antd";
 import TopHeader from "./components/TopHeader";
+import LeftSider from "./components/LeftSider";
+
+export const BreadcrumbList = React.createContext<any>(null);
 
 function App() {
 
-    const navigate = useNavigate();
+    const {Content, Footer} = Layout;
+    const [breadcrumb, setBreadcrumb] = React.useState<string[]>(["仪表盘"]);
+    const [breadcrumbItem, setBreadcrumbItem] = React.useState<any>(null);
 
     useEffect(() => {
-        if (!localStorage.getItem("userInfo")) {
-            let userInfo: IUserInfo = {
-                avatar: "",
-                birthday: "",
-                city: "",
-                email: "",
-                genderDesc: "",
-                id: "",
-                job: "",
-                mobile: 0,
-                nickname: "",
-                sign: "",
-                sourceTypeDesc: "",
-                typeDesc: "",
-                username: ""
-            }
-            CurrentUserInfoApi().then((res: any) => {
-                userInfo = res;
-                localStorage.setItem("userInfo", JSON.stringify(userInfo));
-            }).catch(() => {
-                message.error("用户信息过期或不合法！请重新登录！", 1)
-                    .then(() => navigate("/login"));
-            })
-        }
-    }, [navigate])
-
-    type MenuItem = Required<MenuProps>['items'][number];
-
-    const {Content, Footer, Sider} = Layout;
-
-    const [collapsed, setCollapsed] = useState<boolean>(false);
-
-    const onCollapse = (collapsed: boolean) => {
-        setCollapsed(collapsed);
-    };
-
-    function getItem(
-        label: React.ReactNode,
-        key: React.Key,
-        icon?: React.ReactNode,
-        children?: MenuItem[],
-    ): MenuItem {
-        return {
-            key,
-            icon,
-            children,
-            label,
-        } as MenuItem;
-    }
-
-    const items: MenuItem[] = [
-        getItem('Option 1', '1', <PieChartOutlined/>),
-        getItem('Option 2', '2', <DesktopOutlined/>),
-        getItem('User', 'sub1', <UserOutlined/>, [
-            getItem('Tom', '3'),
-            getItem('Bill', '4'),
-            getItem('Alex', '5'),
-        ]),
-        getItem('Team', 'sub2', <TeamOutlined/>, [getItem('Team 1', '6'), getItem('Team 2', '8')]),
-        getItem('Files', '9', <FileOutlined/>),
-    ];
+        setBreadcrumbItem(
+            breadcrumb.map((item: string) => {
+                return (
+                    <Breadcrumb.Item>{item}</Breadcrumb.Item>
+                );
+            }));
+    }, [breadcrumb])
 
     return (
-        <Layout style={{minHeight: '100vh'}}>
-            <Sider collapsible collapsed={collapsed} onCollapse={onCollapse}>
-                <div className="logo"/>
-                <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" items={items}/>
-            </Sider>
+        <Layout style={{minHeight: '100vh', flexDirection: "row"}}>
+            <BreadcrumbList.Provider value={{breadcrumb, setBreadcrumb}}>
+                <LeftSider/>
+            </BreadcrumbList.Provider>
             <Layout className="site-layout">
-                <TopHeader/>
+                <BreadcrumbList.Provider value={{breadcrumb, setBreadcrumb}}>
+                    <TopHeader/>
+                </BreadcrumbList.Provider>
                 <Content style={{margin: '0 16px'}}>
-                    <Breadcrumb style={{margin: '16px 0'}}>
-                        <Breadcrumb.Item>User</Breadcrumb.Item>
-                        <Breadcrumb.Item>Bill</Breadcrumb.Item>
+                    <Breadcrumb style={{margin: '16px 16px'}}>
+                        {breadcrumbItem}
                     </Breadcrumb>
-                    <div className="site-layout-background" style={{padding: 24, minHeight: 360}}>
-                        Bill is a cat.
-                    </div>
+                    <Space>
+                        <div className="site-layout-background" style={{padding: 24, minHeight: 360}}>
+                            Bill is a cat.
+                        </div>
+                        <div className="site-layout-background" style={{padding: 24, minHeight: 360}}>
+                            Bill is a cat.
+                        </div>
+                    </Space>
                 </Content>
                 <Footer style={{textAlign: 'center'}}>Ant Design ©2018 Created by Ant UED</Footer>
             </Layout>
