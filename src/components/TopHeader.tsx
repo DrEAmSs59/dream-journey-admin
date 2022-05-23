@@ -65,7 +65,7 @@ export default function TopHeader() {
         //     ]}
         //     style={{marginTop: "25px", borderRadius: "5px"}}
         // />
-        <Tabs defaultActiveKey="1" onChange={callback}>
+        <Tabs defaultActiveKey="1" onChange={callback} style={{marginTop: "25px", borderRadius: "5px"}}>
             <TabPane tab="Tab 1" key="1">
                 Content of Tab Pane 1
             </TabPane>
