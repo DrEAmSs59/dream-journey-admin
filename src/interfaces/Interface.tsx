@@ -46,7 +46,7 @@ export interface IHotelCategoryDataType {
 export interface IModalVisible {
     visible: boolean;
     key: number;
-    id?: string;
+    ids?: string[] | React.ReactNode[];
 }
 
 // 酒店分类
@@ -66,4 +66,18 @@ export interface IHotelCategoryQuery {
     sort?: number;
     pageIndex: number;
     pageSize: number;
+}
+
+// 分页对象
+export interface IPage {
+    countId?: string | number;
+    current: number;
+    maxLimit?: number;
+    optimizeCountSql: boolean;
+    orders: any[];
+    pages: number;
+    records: any[];
+    searchCount: boolean;
+    size: number;
+    total: number;
 }

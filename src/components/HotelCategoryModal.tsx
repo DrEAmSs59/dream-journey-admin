@@ -4,7 +4,12 @@ import {Button, Divider, Form, Input, InputNumber, message, Modal, Select, Space
 import TextArea from "antd/es/input/TextArea";
 import "../less/HotelCategoryModal.less"
 import {IHotelCategory} from "../interfaces/Interface";
-import {CreateOrUpdateHotelCategoryApi, QueryHotelLevel1ListApi} from "../request/api";
+import {
+    CreateOrUpdateHotelCategoryApi,
+    DeleteHotelCategoryByIds,
+    QueryHotelCategoryById,
+    QueryHotelCategoryLevel1ListApi
+} from "../request/api";
 import {useNavigate} from "react-router-dom";
 
 
@@ -31,46 +36,73 @@ export default function HotelCategoryModal() {
     useEffect(() => {
         if (modalVisible.key === 1) {
             setTitle("新增分类");
-        } else if (modalVisible.key === 3) {
-            setTitle("修改分类");
-        } else if (modalVisible.key === 2) {
+            setParentVisible(false);
+        } else if (modalVisible.key === 3 && modalVisible.ids) {
+            setTitle("编辑分类");
+            QueryHotelCategoryById("/" + modalVisible.ids[0]).then((res: any) => {
+                form.setFieldsValue(res);
+                if (res.level === 2) {
+                    setParentVisible(true);
+                }
+            })
+        } else if (modalVisible.key === 2 && modalVisible.ids) {
             setTitle("删除分类");
         }
-    }, [modalVisible])
+    }, [modalVisible, form])
 
     useEffect(() => {
         if (parentVisible) {
             let tempArr: any[] = [];
-            QueryHotelLevel1ListApi().then((res: any) => {
-                res.map((item: any) => {
+            QueryHotelCategoryLevel1ListApi().then((res: any) => {
+                res.forEach((item: any) => {
                     tempArr.push(<Option key={item.id}>{item.name}</Option>);
                 });
                 setParentDropdownList(tempArr);
             })
         }
-    }, [parentVisible])
+    }, [parentVisible, Option])
 
     const handleCancel = (key: number) => {
+        form.resetFields();
         setModalVisible({key: key, id: "", visible: false});
     }
 
     const formOnFinish = (hotelCategory: IHotelCategory) => {
         setLoading(true);
-        CreateOrUpdateHotelCategoryApi(hotelCategory).then(() => {
-            message.success("新增分类成功！", 1).then(() => {
-                form.resetFields();
+        if (modalVisible.key === 1) {
+            CreateOrUpdateHotelCategoryApi(hotelCategory).then(() => {
+                message.success("新增分类成功！", 1).then(() => {
+                    form.resetFields();
+                    setLoading(false);
+                    handleCancel(modalVisible.key);
+                });
+            }).catch((err: any) => {
+                if (err.response.status === 401) {
+                    message.error("用户信息过期或不合法！请重新登录！", 1)
+                        .then(() => navigate("/login"));
+                } else {
+                    message.error("新增失败：" + err.response.data, 1).then();
+                }
                 setLoading(false);
-                handleCancel(modalVisible.key);
-            });
-        }).catch((err: any) => {
-            if (err.response.status == 401) {
-                message.error("用户信息过期或不合法！请重新登录！", 1)
-                    .then(() => navigate("/login"));
-            } else {
-                message.error("新增失败：" + err.response.data, 1).then();
-            }
-            setLoading(false);
-        })
+            })
+        } else if (modalVisible.key === 3) {
+            hotelCategory.id = modalVisible.ids[0];
+            CreateOrUpdateHotelCategoryApi(hotelCategory).then(() => {
+                message.success("修改分类成功！", 1).then(() => {
+                    form.resetFields();
+                    setLoading(false);
+                    handleCancel(modalVisible.key);
+                });
+            }).catch((err: any) => {
+                if (err.response.status === 401) {
+                    message.error("用户信息过期或不合法！请重新登录！", 1)
+                        .then(() => navigate("/login"));
+                } else {
+                    message.error("修改失败：" + err.response.data, 1).then();
+                }
+                setLoading(false);
+            })
+        }
     };
 
     const onReset = () => {
@@ -85,6 +117,19 @@ export default function HotelCategoryModal() {
         }
     }
 
+    const deleteOnClick = () => {
+        setLoading(true);
+        DeleteHotelCategoryByIds(modalVisible.ids).then(() => {
+            message.success("删除成功！").then();
+            form.resetFields();
+            setLoading(false);
+            handleCancel(modalVisible.key);
+        }).catch((err: any) => {
+            message.error("删除失败：" + err.response.data).then();
+            setLoading(false);
+        });
+    }
+
     return (
         <Modal visible={modalVisible.visible}
                title={title}
@@ -95,10 +140,22 @@ export default function HotelCategoryModal() {
             {
                 modalVisible.key === 2
                     ?
-                    (<p>注意！<br/>
-                        删除分类会导致已被赋予该分类的酒店消失该分类！<br/>
-                        若所选的分类为顶级分类，则会导致子分类一起删除！
-                    </p>)
+                    (
+                        <div>
+                            <p style={{fontSize: "19px"}}>注意！<br/> <br/>
+                                删除分类会导致已被赋予该分类的酒店消失该分类！<br/> <br/>
+                                若所选的分类为顶级分类，则会导致子分类一起删除！
+                            </p>
+                            <div style={{marginTop: "80px", float: "right"}}>
+                                <Button style={{marginRight: "10px"}} key="back" onClick={() => handleCancel(modalVisible.key)}>
+                                    取消
+                                </Button>
+                                <Button type="primary" onClick={deleteOnClick} loading={loading}>
+                                    确定
+                                </Button>
+                            </div>
+                        </div>
+                    )
                     :
                     (
                         <Form {...layout} form={form} name="control-hooks" onFinish={formOnFinish}>
@@ -118,11 +175,11 @@ export default function HotelCategoryModal() {
                             {
                                 parentVisible
                                     ? (
-                                        <Form.Item name="parentId" label="父层级" rules={[{required: true, message: "请选择父层级！"}]}>
+                                        <Form.Item name="parentId" label="父层级"
+                                                   rules={[{required: true, message: "请选择父层级！"}]}>
                                             <Select
                                                 placeholder="请选择一个父层级"
                                                 allowClear
-                                                // onChange={selectLevelOnChange}
                                             >
                                                 {parentDropdownList}
                                             </Select>
