@@ -7,7 +7,7 @@ import {BreadcrumbList} from "../App";
 
 export default function LeftSider() {
 
-    const {breadcrumb, setBreadcrumb} = useContext(BreadcrumbList);
+    const {setBreadcrumb} = useContext(BreadcrumbList);
 
     type MenuItem = Required<MenuProps>['items'][number];
 
@@ -52,7 +52,7 @@ export default function LeftSider() {
     }
 
     return (
-        <Sider collapsible collapsed={collapsed} onCollapse={onCollapse}>
+        <Sider collapsible collapsed={collapsed} onCollapse={value => onCollapse(value)} trigger={null}>
             <div className="logo"/>
             <Menu theme="dark" defaultSelectedKeys={['仪表盘']} mode="inline" items={items} onClick={onMenuClick}/>
         </Sider>

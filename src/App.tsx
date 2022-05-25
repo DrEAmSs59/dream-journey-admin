@@ -4,6 +4,7 @@ import {Breadcrumb, Layout, Space} from "antd";
 import TopHeader from "./components/TopHeader";
 import LeftSider from "./components/LeftSider";
 import HotelCategory from "./components/HotelCategory";
+import UserSetting from "./components/UserSetting";
 
 export const BreadcrumbList = React.createContext<any>(null);
 
@@ -22,8 +23,28 @@ function App() {
             }));
     }, [breadcrumb])
 
+    const contentView = () => {
+        switch (breadcrumb.at(breadcrumb.length - 1)) {
+            case "酒店分类" :
+                return (<HotelCategory/>);
+            case "个人设置" :
+                return (<UserSetting/>);
+            default :
+                return (
+                    <Space>
+                        <div className="site-layout-background" style={{padding: 24, minHeight: 360}}>
+                            Bill is a cat.
+                        </div>
+                        <div className="site-layout-background" style={{padding: 24, minHeight: 360}}>
+                            Bill is a cat.
+                        </div>
+                    </Space>
+                );
+        }
+    }
+
     return (
-        <Layout style={{minHeight: '100vh', flexDirection: "row"}}>
+        <Layout style={{minHeight: '100vh', flexDirection: "row", lineHeight: "0"}}>
             <BreadcrumbList.Provider value={{breadcrumb, setBreadcrumb}}>
                 <LeftSider/>
             </BreadcrumbList.Provider>
@@ -36,21 +57,10 @@ function App() {
                         {breadcrumbItem}
                     </Breadcrumb>
                     {
-                        breadcrumb.at(breadcrumb.length - 1) === "酒店分类"
-                            ?
-                            (<HotelCategory/>)
-                            :
-                            (<Space>
-                                <div className="site-layout-background" style={{padding: 24, minHeight: 360}}>
-                                    Bill is a cat.
-                                </div>
-                                <div className="site-layout-background" style={{padding: 24, minHeight: 360}}>
-                                    Bill is a cat.
-                                </div>
-                            </Space>)
+                        contentView()
                     }
                 </Content>
-                <Footer style={{textAlign: 'center'}}>Ant Design ©2018 Created by Ant UED</Footer>
+                {/*<Footer style={{textAlign: 'center'}}>Ant Design ©2018 Created by Ant UED</Footer>*/}
             </Layout>
         </Layout>
     );

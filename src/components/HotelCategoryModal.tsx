@@ -12,7 +12,6 @@ import {
 } from "../request/api";
 import {useNavigate} from "react-router-dom";
 
-
 export default function HotelCategoryModal() {
 
     const navigate = useNavigate();
@@ -147,7 +146,8 @@ export default function HotelCategoryModal() {
                                 若所选的分类为顶级分类，则会导致子分类一起删除！
                             </p>
                             <div style={{marginTop: "80px", float: "right"}}>
-                                <Button style={{marginRight: "10px"}} key="back" onClick={() => handleCancel(modalVisible.key)}>
+                                <Button style={{marginRight: "10px"}} key="back"
+                                        onClick={() => handleCancel(modalVisible.key)}>
                                     取消
                                 </Button>
                                 <Button type="primary" onClick={deleteOnClick} loading={loading}>

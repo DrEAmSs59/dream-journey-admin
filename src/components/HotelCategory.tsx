@@ -18,9 +18,7 @@ export default function HotelCategory() {
     const [modalVisible, setModalVisible] = useState<IModalVisible>({key: 0, ids: [], visible: false});
     const [loadings, setLoadings] = useState<boolean[]>([]);
     const [hotelCategoryList, setHotelCategoryList] = useState<IHotelCategoryDataType[]>([]);
-    const [hotelCategoryParams, setHotelCategoryParams] = useState<IHotelCategoryQuery>(
-        {pageIndex: 1, pageSize: 10}
-    );
+    const [hotelCategoryParams, setHotelCategoryParams] = useState<IHotelCategoryQuery>({pageIndex: 1, pageSize: 10});
     const [selectedHotelCategoryIds, setSelectedHotelCategoryIds] = useState<React.ReactNode[]>([]);
     const [searchLoading, setSearchLoading] = useState<boolean>(true);
     const [pagination, setPagination] = useState<IPage>({
@@ -153,6 +151,7 @@ export default function HotelCategory() {
     const [form] = Form.useForm();
 
     const onSearchFinish = (searchParams: IHotelCategoryQuery) => {
+        setSelectedHotelCategoryIds([]);
         setSearchLoading(true);
         searchParams.pageIndex = hotelCategoryParams.pageIndex;
         searchParams.pageSize = hotelCategoryParams.pageSize;
@@ -160,7 +159,7 @@ export default function HotelCategory() {
     }
 
     return (
-        <div className="site-layout-background" style={{padding: 24, minHeight: 360}}>
+        <div className="site-layout-background" style={{padding: 24, minHeight: 360, height: "88%"}}>
             <Button
                 type="primary"
                 icon={<PlusOutlined/>}
@@ -215,11 +214,11 @@ export default function HotelCategory() {
                 columns={columns}
                 rowSelection={{...rowSelection}}
                 dataSource={hotelCategoryList}
-                style={{marginTop: "20px"}}
+                style={{marginTop: "20px", width: "100%"}}
                 locale={{emptyText: "暂无数据"}}
                 pagination={{
                     showTotal: (total: number) => `共 ${total} 条`,
-                    style: {marginTop: "45px"},
+                    style: {marginTop: "23px"},
                     onChange: (page: number) => {
                         hotelCategoryParams.pageIndex = page;
                         setHotelCategoryParams(hotelCategoryParams);
