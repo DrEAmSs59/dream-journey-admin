@@ -159,7 +159,7 @@ export default function HotelCategory() {
     }
 
     return (
-        <div className="site-layout-background" style={{padding: 24, minHeight: 360, height: "88%"}}>
+        <div className="site-layout-background" style={{padding: 24, minHeight: 360, height: "92%"}}>
             <Button
                 type="primary"
                 icon={<PlusOutlined/>}

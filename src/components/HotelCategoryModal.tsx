@@ -6,8 +6,8 @@ import "../less/HotelCategoryModal.less"
 import {IHotelCategory} from "../interfaces/Interface";
 import {
     CreateOrUpdateHotelCategoryApi,
-    DeleteHotelCategoryByIds,
-    QueryHotelCategoryById,
+    DeleteHotelCategoryByIdsApi,
+    QueryHotelCategoryByIdApi,
     QueryHotelCategoryLevel1ListApi
 } from "../request/api";
 import {useNavigate} from "react-router-dom";
@@ -38,7 +38,7 @@ export default function HotelCategoryModal() {
             setParentVisible(false);
         } else if (modalVisible.key === 3 && modalVisible.ids) {
             setTitle("编辑分类");
-            QueryHotelCategoryById("/" + modalVisible.ids[0]).then((res: any) => {
+            QueryHotelCategoryByIdApi("/" + modalVisible.ids[0]).then((res: any) => {
                 form.setFieldsValue(res);
                 if (res.level === 2) {
                     setParentVisible(true);
@@ -118,7 +118,7 @@ export default function HotelCategoryModal() {
 
     const deleteOnClick = () => {
         setLoading(true);
-        DeleteHotelCategoryByIds(modalVisible.ids).then(() => {
+        DeleteHotelCategoryByIdsApi(modalVisible.ids).then(() => {
             message.success("删除成功！").then();
             form.resetFields();
             setLoading(false);

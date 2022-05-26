@@ -1,44 +1,13 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Form, Input, Cascader, Select, Button, Avatar, Space, Upload, UploadProps, message,} from 'antd';
 import "../less/UserSettingBase.less";
 import {UserOutlined, UploadOutlined} from '@ant-design/icons';
+import {CurrentUserInfoApi, GetUserAvatarApi, RegisterOrUpdateUserInfoApi, UploadUserAvatarApi} from "../request/api";
+import {IUserInfo} from "../interfaces/Interface";
+import {useNavigate} from "react-router-dom";
+import city from '../assets/city.json';
 
 const {Option} = Select;
-
-const residences = [
-    {
-        value: 'zhejiang',
-        label: 'Zhejiang',
-        children: [
-            {
-                value: 'hangzhou',
-                label: 'Hangzhou',
-                children: [
-                    {
-                        value: 'xihu',
-                        label: 'West Lake',
-                    },
-                ],
-            },
-        ],
-    },
-    {
-        value: 'jiangsu',
-        label: 'Jiangsu',
-        children: [
-            {
-                value: 'nanjing',
-                label: 'Nanjing',
-                children: [
-                    {
-                        value: 'zhonghuamen',
-                        label: 'Zhong Hua Men',
-                    },
-                ],
-            },
-        ],
-    },
-];
 
 const formItemLayout = {
     wrapperCol: {
@@ -51,8 +20,32 @@ export default function UserSettingBase() {
 
     const [form] = Form.useForm();
 
-    const onFinish = (values: any) => {
-        console.log('Received values of form: ', values);
+    const navigate = useNavigate();
+
+    const [token, setToken] = useState<string>("");
+    const [avatar, setAvatar] = useState<string>("");
+
+    const onFormFinish = (values: any) => {
+        let userJsonStr: any = localStorage.getItem("userInfo");
+        values.id = JSON.parse(userJsonStr).id;
+        RegisterOrUpdateUserInfoApi(values).then(() => {
+            message.success("修改成功", 1).then(() => {
+                CurrentUserInfoApi().then((res: any) => {
+                    localStorage.setItem("userInfo", JSON.stringify(res));
+                    setAvatar(res.avatar);
+                }).catch(() => {
+                    message.error("用户信息过期或不合法！请重新登录！", 1)
+                        .then(() => navigate("/login"));
+                })
+            });
+        }).catch((err: any) => {
+            if (err.response.status === 401) {
+                message.error("用户信息过期或不合法！请重新登录！", 1)
+                    .then(() => navigate("/login"));
+            } else {
+                message.error("修改失败：" + err.response.data, 1).then();
+            }
+        })
     };
 
     const props: UploadProps = {
@@ -67,27 +60,35 @@ export default function UserSettingBase() {
             }
             return isJpgOrPng && isLt2M;
         },
-        name: 'file',
-        action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
+        name: 'multipartFile',
+        action: UploadUserAvatarApi,
         headers: {
-            authorization: 'authorization-text',
+            token: token
         },
-        onChange(info) {
-            if (info.file.status !== 'uploading') {
-                console.log(info.file, info.fileList);
-            }
+        onChange(info: any) {
             if (info.file.status === 'done') {
-                message.success(`${info.file.name} file uploaded successfully`).then();
+                message.success("上传成功！").then();
+                CurrentUserInfoApi().then((res: any) => {
+                    localStorage.setItem("userInfo", JSON.stringify(res));
+                    setAvatar(res.avatar);
+                }).catch(() => {
+                    message.error("用户信息过期或不合法！请重新登录！", 1)
+                        .then(() => navigate("/login"));
+                })
             } else if (info.file.status === 'error') {
-                message.error(`${info.file.name} file upload failed.`).then();
+                message.error("上传失败！").then();
             }
-        },
+        }
     };
 
     useEffect(() => {
         let userJsonStr: any = localStorage.getItem("userInfo");
-        form.setFieldsValue(JSON.parse(userJsonStr));
-    }, [form])
+        let userInfo: IUserInfo = JSON.parse(userJsonStr);
+        let tempToken: any = localStorage.getItem("token");
+        form.setFieldsValue(userInfo);
+        setToken(tempToken);
+        setAvatar(userInfo.avatar);
+    }, [form, avatar])
 
     return (
         <div className="user-info-box">
@@ -100,7 +101,7 @@ export default function UserSettingBase() {
                         {...formItemLayout}
                         form={form}
                         name="userInfo"
-                        onFinish={onFinish}
+                        onFinish={onFormFinish}
                         scrollToFirstError
                     >
                         <div className="input-title">
@@ -122,7 +123,7 @@ export default function UserSettingBase() {
                             tooltip="希望别人如何称呼您？"
                             rules={[{required: true, message: '请输入昵称！', whitespace: true}]}
                         >
-                            <Input/>
+                            <Input allowClear/>
                         </Form.Item>
                         <div className="input-title">
                             性别
@@ -148,7 +149,7 @@ export default function UserSettingBase() {
                                 {type: 'array', required: false},
                             ]}
                         >
-                            <Cascader options={residences}/>
+                            <Cascader options={city} allowClear/>
                         </Form.Item>
                         <div className="input-title">
                             电子邮箱
@@ -166,7 +167,7 @@ export default function UserSettingBase() {
                                 },
                             ]}
                         >
-                            <Input/>
+                            <Input allowClear/>
                         </Form.Item>
                         <div className="input-title">
                             电话号码
@@ -176,7 +177,7 @@ export default function UserSettingBase() {
                             name="mobile"
                             rules={[{required: false}]}
                         >
-                            <Input/>
+                            <Input allowClear/>
                         </Form.Item>
                         <div className="input-title">
                             个性签名
@@ -186,7 +187,7 @@ export default function UserSettingBase() {
                             name="sign"
                             rules={[{required: false}]}
                         >
-                            <Input.TextArea showCount maxLength={100}/>
+                            <Input.TextArea allowClear showCount maxLength={100}/>
                         </Form.Item>
                         <Form.Item>
                             <Button type="primary" htmlType="submit" style={{width: "335px", marginTop: "5px"}}>
@@ -203,9 +204,10 @@ export default function UserSettingBase() {
                         <Avatar
                             size={{xs: 24, sm: 32, md: 40, lg: 64, xl: 80, xxl: 150}}
                             icon={<UserOutlined/>}
+                            src={GetUserAvatarApi + "?avatar=" + avatar}
                         />
-                        <Upload {...props} fileList={[]}>
-                            <Button icon={<UploadOutlined />} style={{marginLeft: "20px"}}>更换头像</Button>
+                        <Upload {...props} showUploadList={false}>
+                            <Button icon={<UploadOutlined/>} style={{marginLeft: "20px"}}>更换头像</Button>
                         </Upload>
                     </Space>
                 </div>

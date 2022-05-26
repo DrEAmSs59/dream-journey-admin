@@ -1,6 +1,7 @@
 import request from './request'
-import {IHotelCategory, IHotelCategoryQuery, ILogin} from "../interfaces/Interface";
+import {IHotelCategory, IHotelCategoryQuery, ILogin, IUserInfo} from "../interfaces/Interface";
 import React from "react";
+import {serverConfig} from "../serverConfig";
 
 // 管理员登录接口
 export const AdminLoginApi = (params: ILogin) => request.post('/user/adminLogin', params);
@@ -18,7 +19,16 @@ export const QueryHotelCategoryListApi = (params: IHotelCategoryQuery) => reques
 export const QueryHotelCategoryLevel1ListApi = () => request.get("/hotel/category/queryLevel1List");
 
 // 根据id查询单条酒店分类接口
-export const QueryHotelCategoryById = (params: string) => request.get("/hotel/category/queryById" + params)
+export const QueryHotelCategoryByIdApi = (params: string) => request.get("/hotel/category/queryById" + params)
 
-// 删除酒店分类
-export const DeleteHotelCategoryByIds = (params: string[] | React.ReactNode[]) => request.post("/hotel/category/deleteByIds", params);
+// 删除酒店分类接口
+export const DeleteHotelCategoryByIdsApi = (params: string[] | React.ReactNode[]) => request.post("/hotel/category/deleteByIds", params);
+
+// 上传用户头像接口
+export const UploadUserAvatarApi = serverConfig.baseURL + "/user/uploadAvatar";
+
+// 获取用户头像接口
+export const GetUserAvatarApi = serverConfig.baseURL + "/user/getAvatar";
+
+// 注册或更新用户接口
+export const RegisterOrUpdateUserInfoApi = (params: IUserInfo) => request.post("/user/registerOrUpdate", params);

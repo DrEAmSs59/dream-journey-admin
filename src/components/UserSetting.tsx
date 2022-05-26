@@ -6,7 +6,7 @@ const {TabPane} = Tabs;
 
 export default function UserSetting() {
     return (
-        <div className="site-layout-background" style={{padding: 24, minHeight: 360, height: "88%"}}>
+        <div className="site-layout-background" style={{padding: 24, minHeight: 360, height: "92%"}}>
             <Tabs tabPosition={"left"}>
                 <TabPane tab="基本设置" key="1">
                     <UserSettingBase/>
