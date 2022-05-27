@@ -97,8 +97,10 @@ export default function TopHeader() {
                 nickname: "",
                 sign: "",
                 sourceTypeDesc: "",
-                typeDesc: "",
-                username: ""
+                userTypeDesc: "",
+                username: "",
+                userStatus: "",
+                userStatusDesc: ""
             }
             CurrentUserInfoApi().then((res: any) => {
                 userInfo = res;

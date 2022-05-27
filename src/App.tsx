@@ -5,6 +5,7 @@ import TopHeader from "./components/TopHeader";
 import LeftSider from "./components/LeftSider";
 import HotelCategory from "./components/HotelCategory";
 import UserSetting from "./components/UserSetting";
+import UserList from "./components/UserList";
 
 export const BreadcrumbList = React.createContext<any>(null);
 
@@ -29,6 +30,8 @@ function App() {
                 return (<HotelCategory/>);
             case "个人设置" :
                 return (<UserSetting/>);
+            case "用户管理" :
+                return (<UserList/>);
             default :
                 return (
                     <Space>

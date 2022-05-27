@@ -25,7 +25,9 @@ export interface IUserInfo {
     city: string;
     job: string;
     sign: string;
-    typeDesc: string;
+    userStatus: number | string;
+    userStatusDesc: string;
+    userTypeDesc: string;
     sourceTypeDesc: string;
 }
 
@@ -80,4 +82,13 @@ export interface IPage {
     searchCount: boolean;
     size: number;
     total: number;
+}
+
+// 查询用户列表
+export interface IUserQuery {
+    pageIndex: number;
+    pageSize: number;
+    username?: string;
+    mobile?: number;
+    email?: string;
 }

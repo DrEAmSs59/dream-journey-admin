@@ -32,3 +32,6 @@ export const GetUserAvatarApi = serverConfig.baseURL + "/user/getAvatar";
 
 // 注册或更新用户接口
 export const RegisterOrUpdateUserInfoApi = (params: IUserInfo) => request.post("/user/registerOrUpdate", params);
+
+// 获取用户列表接口
+export const QueryUserListApi = (params: string) => request.get("/user/queryUserList" + params)
