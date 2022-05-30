@@ -86,6 +86,7 @@ export interface IPage {
 
 // 查询用户列表
 export interface IUserQuery {
+    userStatus?: number;
     pageIndex: number;
     pageSize: number;
     username?: string;

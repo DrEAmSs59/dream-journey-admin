@@ -4,7 +4,7 @@ import React from "react";
 import {serverConfig} from "../serverConfig";
 
 // 管理员登录接口
-export const AdminLoginApi = (params: ILogin) => request.post('/user/adminLogin', params);
+export const AdminLoginApi = (params: ILogin) => request.post('/admin/adminLogin', params);
 
 // 获取当前用户接口
 export const CurrentUserInfoApi = () => request.get("/user/currentUserInfo");
@@ -34,4 +34,10 @@ export const GetUserAvatarApi = serverConfig.baseURL + "/user/getAvatar";
 export const RegisterOrUpdateUserInfoApi = (params: IUserInfo) => request.post("/user/registerOrUpdate", params);
 
 // 获取用户列表接口
-export const QueryUserListApi = (params: string) => request.get("/user/queryUserList" + params)
+export const QueryUserListApi = (params: string) => request.get("/admin/queryUserList" + params)
+
+// 冻结用户接口
+export const BanUserApi = (params: string) => request.get("/admin/ban" + params);
+
+// 解冻用户接口
+export const UnbanUserApi = (params: string) => request.get("/admin/unban" + params);
